@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đố Vui Bé Yêu</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
+
+    body {
+      background: linear-gradient(135deg, #e0f7fa, #fce4ec, #e8f5e9);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #e91e63;
+    }
+
+    .music-btn {
+      background: #ff6b9d;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    /* Pages */
+    .page { display: none; padding: 25px 18px 50px; max-width: 900px; margin: 0 auto; }
+    .page.active { display: block; animation: fadeIn 0.4s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      color: #e91e63;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #7b1fa2;
+      margin-bottom: 30px;
+      font-size: 1.1rem;
+    }
+
+    /* Category cards */
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .cat-card {
+      background: white;
+      border-radius: 24px;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 4px solid transparent;
+    }
+
+    .cat-card:hover {
+      transform: translateY(-8px);
+      border-color: #ff6b9d;
+    }
+
+    .cat-card .icon { font-size: 3.5rem; margin-bottom: 12px; }
+    .cat-card .title { font-size: 1.3rem; font-weight: 800; color: #333; }
+
+    /* Game area */
+    .score-bar {
+      display: flex;
+      justify-content: space-between;
+      background: white;
+      padding: 12px 20px;
+      border-radius: 50px;
+      margin-bottom: 25px;
+      font-weight: 700;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+
+    .question-box {
+      background: white;
+      border-radius: 24px;
+      padding: 25px 20px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .question-text {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #333;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .option-btn {
+      background: #f8f9fa;
+      border: 3px solid #e0e0e0;
+      border-radius: 20px;
+      padding: 15px 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .option-btn img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      border-radius: 12px;
+    }
+
+    .option-btn:hover {
+      border-color: #ff6b9d;
+      background: #fff0f5;
+      transform: scale(1.03);
+    }
+
+    .option-btn.correct {
+      background: #d4edda !important;
+      border-color: #28a745 !important;
+    }
+
+    .option-btn.wrong {
+      background: #f8d7da !important;
+      border-color: #dc3545 !important;
+    }
+
+    .result-img {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      margin: 15px auto;
+      display: block;
+      border-radius: 20px;
+    }
+
+    .next-btn, .back-btn {
+      background: linear-gradient(45deg, #ff6b9d, #c44569);
+      color: white;
+      border: none;
+      padding: 14px 35px;
+      border-radius: 50px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      cursor: pointer;
+      margin: 10px 8px;
+      box-shadow: 0 8px 20px rgba(233,30,99,0.3);
+    }
+
+    .next-btn { display: none; }
+    .next-btn.show { display: inline-block; }
+
+    .feedback {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 15px 0;
+      min-height: 30px;
+    }
+
+    .feedback.correct { color: #28a745; }
+    .feedback.wrong { color: #dc3545; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">🌟 Đố Vui Bé Yêu</div>
+    <button class="music-btn" id="musicBtn" onclick="toggleMusic()">🎵 Nhạc nền: Tắt</button>
+  </header>
+
+  <!-- Trang chủ -->
+  <div id="home" class="page active">
+    <h1>Chọn chủ đề nào bé ơi!</h1>
+    <p class="subtitle">Cùng chơi đố vui thật vui nhé</p>
+
+    <div class="categories">
+      <div class="cat-card" onclick="startCategory('animal')">
+        <div class="icon">🐷</div>
+        <div class="title">Thế giới Động vật</div>
+      </div>
+      <div class="cat-card" onclick="startCategory('plant')">
+        <div class="icon">🍌</div>
+        <div class="title">Cây cối & Hoa quả</div>
+      </div>
+      <div class="cat-card" onclick="startCategory('object')">
+        <div class="icon">✏️</div>
+        <div class="title">Đồ vật & Cuộc sống</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trang chơi -->
+  <div id="game" class="page">
+    <div class="score-bar">
+      <div>Điểm: <span id="score">0</span></div>
+      <div>Câu: <span id="current">1</span>/<span id="totalQ">5</span></div>
+    </div>
+
+    <div class="question-box">
+      <div class="question-text" id="questionText">Câu hỏi sẽ hiện ở đây</div>
+      <img id="resultImg" class="result-img" style="display:none">
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="options" id="options"></div>
+
+    <div style="text-align:center; margin-top:25px">
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Câu tiếp theo →</button>
+      <button class="back-btn" onclick="goHome()">← Về trang chủ</button>
+    </div>
+  </div>
+
+  <!-- Nhạc nền -->
+  <audio id="bgMusic" loop>
+    <source src="nhac-nen.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ===== DỮ LIỆU CÂU HỎI =====
+    const data = {
+      animal: [
+        {
+          q: "Con gì ăn no, bụng phệ, nằm thở phì phò?",
+          answer: "Con lợn",
+          img: "lon.png",
+          options: ["Con lợn", "Con bò", "Con gà", "Con vịt"]
+        },
+        {
+          q: "Con gì gáy ò ó o, gọi ban thức dậy?",
+          answer: "Con gà trống",
+          img: "ga.png",
+          options: ["Con gà trống", "Con vịt", "Con chim", "Con mèo"]
+        },
+        {
+          q: "Con gì đuôi ngắn tai dài, mắt hồng lông mượt?",
+          answer: "Con thỏ",
+          img: "tho.png",
+          options: ["Con thỏ", "Con chó", "Con mèo", "Con chuột"]
+        },
+        {
+          q: "Con gì chuyên giữ nhà, thấy người lạ sủa vang?",
+          answer: "Con chó",
+          img: "cho.png",
+          options: ["Con chó", "Con mèo", "Con gà", "Con lợn"]
+        },
+        {
+          q: "Con gì nhảy nhót trèo cây, thích ăn quả chuối?",
+          answer: "Con khỉ",
+          img: "khi.png",
+          options: ["Con khỉ", "Con gấu", "Con thỏ", "Con sóc"]
+        }
+      ],
+      plant: [
+        {
+          q: "Quả gì áo vàng xanh, ăn vào ngọt lịm?",
+          answer: "Quả chuối",
+          img: "",
+          options: ["Quả chuối", "Quả táo", "Quả cam", "Quả xoài"]
+        },
+        {
+          q: "Quả gì nhiều mắt, khi chín ăn rất ngọt?",
+          answer: "Quả dứa",
+          img: "",
+          options: ["Quả dứa", "Quả dưa", "Quả nho", "Quả lê"]
+        },
+        {
+          q: "Cây gì thân cao, lá xòe như chiếc quạt?",
+          answer: "Cây dừa",
+          img: "",
+          options: ["Cây dừa", "Cây chuối", "Cây mit", "Cây xoài"]
+        },
+        {
+          q: "Hoa gì màu đỏ, nở rộ mùa hè, báo hiệu chia tay?",
+          answer: "Hoa phượng",
+          img: "",
+          options: ["Hoa phượng", "Hoa hồng", "Hoa mai", "Hoa cúc"]
+        },
+        {
+          q: "Quả gì mặc áo xanh, ruột đỏ có hạt đen?",
+          answer: "Quả dưa hấu",
+          img: "",
+          options: ["Quả dưa hấu", "Quả táo", "Quả lê", "Quả cam"]
+        }
+      ],
+      object: [
+        {
+          q: "Cái gì giúp bé vẽ tranh, viết chữ mỗi ngày?",
+          answer: "Cái bút",
+          img: "",
+          options: ["Cái bút", "Cái thước", "Cái bảng", "Cái sách"]
+        },
+        {
+          q: "Cái gì có bốn chân, để bé ngồi học bài?",
+          answer: "Cái ghế",
+          img: "",
+          options: ["Cái ghế", "Cái bàn", "Cái tủ", "Cái giường"]
+        },
+        {
+          q: "Cái gì hai mắt tròn xoe, chạy tích tắc suốt ngày?",
+          answer: "Cái đồng hồ",
+          img: "",
+          options: ["Cái đồng hồ", "Cái kính", "Cái đèn", "Cái quạt"]
+        },
+        {
+          q: "Cái gì che nắng che mưa mỗi khi đi học?",
+          answer: "Cái ô",
+          img: "",
+          options: ["Cái ô", "Cái mũ", "Cái áo", "Cái cặp"]
+        },
+        {
+          q: "Cái gì mặc quần áo cho bé, giữ ấm mùa đông?",
+          answer: "Cái áo",
+          img: "",
+          options: ["Cái áo", "Cái quần", "Cái tất", "Cái khăn"]
+        }
+      ]
+    };
+
+    let currentCategory = null;
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    // Âm thanh
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, dur, type="sine") {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+      o.start(); o.stop(audioCtx.currentTime + dur);
+    }
+    function playCorrect() { playTone(523,0.1); setTimeout(()=>playTone(659,0.1),100); setTimeout(()=>playTone(784,0.15),200); }
+    function playWrong() { playTone(180,0.25,"sawtooth"); }
+    function playClick() { playTone(700,0.07); }
+
+    // Nhạc nền
+    const bgMusic = document.getElementById("bgMusic");
+    let musicOn = false;
+    function toggleMusic() {
+      if (musicOn) {
+        bgMusic.pause();
+        document.getElementById("musicBtn").textContent = "🎵 Nhạc nền: Tắt";
+      } else {
+        bgMusic.play().catch(()=>{});
+        document.getElementById("musicBtn").textContent = "🎵 Nhạc nền: Bật";
+      }
+      musicOn = !musicOn;
+    }
+
+    function startCategory(cat) {
+      playClick();
+      currentCategory = cat;
+      currentIndex = 0;
+      score = 0;
+      document.getElementById("score").textContent = 0;
+      document.getElementById("totalQ").textContent = data[cat].length;
+      document.getElementById("home").classList.remove("active");
+      document.getElementById("game").classList.add("active");
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      answered = false;
+      const q = data[currentCategory][currentIndex];
+      document.getElementById("questionText").textContent = q.q;
+      document.getElementById("current").textContent = currentIndex + 1;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("resultImg").style.display = "none";
+      document.getElementById("nextBtn").classList.remove("show");
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+
+      // xáo trộn đáp án
+      const opts = [...q.options].sort(() => Math.random() - 0.5);
+
+      opts.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<span style="font-size:1.8rem">${getEmoji(opt)}</span><span>${opt}</span>`;
+        btn.onclick = () => checkAnswer(opt, btn, q);
+        optionsDiv.appendChild(btn);
+      });
+    }
+
+    function getEmoji(name) {
+      const map = {
+        "Con lợn": "🐷", "Con bò": "🐮", "Con gà": "🐔", "Con vịt": "🦆",
+        "Con gà trống": "🐓", "Con chim": "🐦", "Con mèo": "🐱",
+        "Con thỏ": "🐰", "Con chó": "🐶", "Con chuột": "🐭",
+        "Con khỉ": "🐵", "Con gấu": "🐻", "Con sóc": "🐿️",
+        "Quả chuối": "🍌", "Quả táo": "🍎", "Quả cam": "🍊", "Quả xoài": "🥭",
+        "Quả dứa": "🍍", "Quả dưa": "🍈", "Quả nho": "🍇", "Quả lê": "🍐",
+        "Cây dừa": "🌴", "Cây chuối": "🍌", "Cây mit": "🌳", "Cây xoài": "🌳",
+        "Hoa phượng": "🌺", "Hoa hồng": "🌹", "Hoa mai": "🌼", "Hoa cúc": "🌼",
+        "Quả dưa hấu": "🍉",
+        "Cái bút": "✏️", "Cái thước": "📏", "Cái bảng": "📋", "Cái sách": "📚",
+        "Cái ghế": "🪑", "Cái bàn": "🪵", "Cái tủ": "🗄️", "Cái giường": "🛏️",
+        "Cái đồng hồ": "🕐", "Cái kính": "👓", "Cái đèn": "💡", "Cái quạt": "🌀",
+        "Cái ô": "☂️", "Cái mũ": "🧢", "Cái áo": "👕", "Cái quần": "👖",
+        "Cái tất": "🧦", "Cái khăn": "🧣", "Cái cặp": "🎒"
+      };
+      return map[name] || "❓";
+    }
+
+    function checkAnswer(selected, btn, q) {
+      if (answered) return;
+      answered = true;
+
+      const allBtns = document.querySelectorAll(".option-btn");
+      allBtns.forEach(b => b.style.pointerEvents = "none");
+
+      if (selected === q.answer) {
+        score++;
+        document.getElementById("score").textContent = score;
+        btn.classList.add("correct");
+        document.getElementById("feedback").textContent = "🎉 Đúng rồi! Giỏi quá!";
+        document.getElementById("feedback").className = "feedback correct";
+        playCorrect();
+      } else {
+        btn.classList.add("wrong");
+        document.getElementById("feedback").textContent = `😢 Sai rồi! Đáp án đúng là: ${q.answer}`;
+        document.getElementById("feedback").className = "feedback wrong";
+        playWrong();
+        // highlight đúng
+        allBtns.forEach(b => {
+          if (b.textContent.includes(q.answer)) b.classList.add("correct");
+        });
+      }
+
+      // hiện hình nếu có
+      if (q.img) {
+        const img = document.getElementById("resultImg");
+        img.src = q.img;
+        img.style.display = "block";
+        img.onerror = () => img.style.display = "none";
+      }
+
+      document.getElementById("nextBtn").classList.add("show");
+    }
+
+    function nextQuestion() {
+      playClick();
+      currentIndex++;
+      if (currentIndex >= data[currentCategory].length) {
+        alert(`🎉 Bé đã hoàn thành!\nĐiểm số: ${score}/${data[currentCategory].length}`);
+        goHome();
+      } else {
+        loadQuestion();
+      }
+    }
+
+    function goHome() {
+      playClick();
+      document.getElementById("game").classList.remove("active");
+      document.getElementById("home").classList.add("active");
+    }
+  </script>
+</body>
+</html>
